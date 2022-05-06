@@ -3,7 +3,9 @@
 	"version": "0.0.1",
 	"description": "A Pixel Art Tool",
 	"scripts": {
-		"test": "neu run"
+		"test": "neu run",
+		"build": "node enableInspector.js false && neu build && node enableInspector.js true",
+		"clean": "rm -r dist"
 	},
 	"repository": {
 		"type": "git",
