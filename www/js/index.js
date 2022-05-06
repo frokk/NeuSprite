@@ -3,44 +3,59 @@ var is = {
 	LMouseDown: false,
 	SpaceDown: false
 };
-var CanvasObj = {}
-var canvasHolder = document.getElementById("canvasHolder");
-var tool = 'b'; // B - Brush, E - Eraser, I - Ink Dropper.
-var toolSize = 2; // Holds the size of brush and eraser.
-
-CanvasObj.element = document.createElement("canvas");
-CanvasObj.ctx = CanvasObj.element.getContext("2d");
-CanvasObj.width = 60;
-CanvasObj.height = 40;
-
+var M_Pos = { x: null, y: null }
+var CanvasObj = {
+	element: document.getElementById("drawingCanvas"),
+	ctx: document.getElementById("drawingCanvas").getContext("2d"),
+	width: 60,
+	height: 40,
+}
 CanvasObj.element.height = CanvasObj.height;
 CanvasObj.element.width = CanvasObj.width;
-canvasHolder.appendChild(CanvasObj.element);
-CanvasObj.ctx.imageSmoothingEnabled = true;
-CanvasObj.panzoom = panzoom(CanvasObj.element, {
+CanvasObj.ctx.imageSmoothingEnabled = false;
+
+var canvasPanArea = document.getElementById("canvasPanArea");
+var tool = 'b'; // B - Brush, E - Eraser, I - Ink Dropper.
+var toolSize = 2; // Holds the size of brush and eraser.
+var zoomSize = 10;
+var lastMPos = { x: null, y: null };
+
+var PanZoom = panzoom(document.getElementById("canvasWrapper"), {
 	maxZoom: 50, // Maximum Zoom Size
 	minZoom: 0.5, // Minimum Zoom Size
-	zoomSpeed: 1, // Zoom Speed
+	zoomSpeed: 0.5, // Zoom Speed
 	smoothScroll: false, // Smooth Scroll
 	transformOrigin: null, // Position From Which To Tranform From.
-	initialZoom: 8, // Initial Zoom Size.
+	initialZoom: zoomSize, // Initial Zoom Size.
 	onTouch: (e) => { return false; }, // Disable Touch Response.
-	onDoubleClick: (e) => { return false; }, // Disable Double Click Zoom On Element
-	beforeWheel: (e) => { return !is.CtrlDown; }, // Only Zoom When Ctrl Key is Pressed.
-	beforeMouseDown: function(e) {
-		return !is.SpaceDown;
-	}
+	// Disable Double Click Zoom
+	onDoubleClick: (e) => { return false; },
+	zoomDoubleClickSpeed: 1,
+	beforeWheel: (e) => { return is.CtrlDown; }, // Only Zoom When Ctrl Key is Pressed.
+	beforeMouseDown: function(e) { return !is.SpaceDown; } // Only if Space Key is not Pressed.
 });
 
+var PreviewCanvas = {
+	element: document.getElementById("brushPreview"),
+	ctx: document.getElementById("brushPreview").getContext("2d"),
+}
+PreviewCanvas.height = CanvasObj.height;
+PreviewCanvas.width = CanvasObj.width;
+PreviewCanvas.element.height = PreviewCanvas.height;
+PreviewCanvas.element.width = PreviewCanvas.width;
+PreviewCanvas.ctx.imageSmoothingEnabled = false;
+
 // Returns A Object Containing X, Y Position Clicked On the Canvas
-function getCursorPosition(e) {
+function UpdateCursorPosition(e) {
 	var rect = e.target.getBoundingClientRect(),
 	scaleX = e.target.width / rect.width,
 	scaleY = e.target.height / rect.height;
 
 	let x = ~~((e.clientX - rect.left) * scaleX);
 	let y = ~~((e.clientY - rect.top) * scaleY);
-	return { x: x, y: y };
+
+	lastMPos = M_Pos;
+	M_Pos = { x: x, y: y };
 }
 
 // Called When The Window is Closed, Do all the cleanup and stuff here.
@@ -56,10 +71,6 @@ function onNeutralinoReady() {
 Neutralino.init();
 Neutralino.events.on("windowClose", onWindowClose);
 Neutralino.events.on("ready", onNeutralinoReady);
-
-CanvasObj.element.addEventListener('mouseup', function(e) {
-	is.MouseDown = false;
-});
 
 // Custom Color Picker Button
 var colorPicker = document.getElementById("colorPicker");
@@ -101,8 +112,24 @@ Mousetrap.bind('ctrl', function(e) {
 	is.CtrlDown = false;
 }, 'keyup');
 
-function brushTool(x, y, color) {
-	if (color.length != 4) return;
+function RGB2Hex(RGB) {
+	var hex = null
+	if (RGB) {
+		hex = (RGB[0] | 1 << 8).toString(16).slice(1) +
+			  (RGB[1] | 1 << 8).toString(16).slice(1) +
+			  (RGB[2] | 1 << 8).toString(16).slice(1);
+	}
+
+	return "#" + hex;
+}
+
+function previewBrush(x, y, color) {
+	PreviewCanvas.ctx.clearRect(0, 0, PreviewCanvas.width, PreviewCanvas.height);
+	PreviewCanvas.ctx.fillStyle = colorPicker.value;
+	PreviewCanvas.ctx.fillRect(x, y, toolSize, toolSize);
+}
+
+function brushTool(x, y) {
 	CanvasObj.ctx.fillStyle = colorPicker.value;
 	CanvasObj.ctx.fillRect(x, y, toolSize, toolSize);
 }
@@ -111,34 +138,55 @@ function eraserTool(x, y) {
 	CanvasObj.ctx.clearRect(x, y, toolSize, toolSize);
 }
 
+window.addEventListener("resize", function(e) {
+	PanZoom.moveTo(0, 0);
+});
+
+PreviewCanvas.element.addEventListener('mouseup', function(e) {
+	is.LMouseDown = false;
+});
+
 // Draw on Mouse Click
-CanvasObj.element.addEventListener('mousedown', function(e) {
-	is.MouseDown = true;
+PreviewCanvas.element.addEventListener('mousedown', function(e) {
+	if (e.button == 0) {
+		is.LMouseDown = true;
+	}
 	if (is.SpaceDown == false) {
 		processEvents(e);
 	}
 });
 
+// Clear The Preview Canvas On Leave
+PreviewCanvas.element.addEventListener('mouseleave', function(e) {
+	PreviewCanvas.ctx.clearRect(0, 0, PreviewCanvas.width, PreviewCanvas.height);
+});
+
 // Draw On Mouse Move
-CanvasObj.element.addEventListener('mousemove', function(e) {
-	if (is.MouseDown == true && is.SpaceDown == false) {
+PreviewCanvas.element.addEventListener('mousemove', function(e) {
+	UpdateCursorPosition(e);
+	if (is.LMouseDown == true && is.SpaceDown == false) {
 		processEvents(e);
+	} else {
+		if (tool == 'b') {
+			previewBrush(M_Pos.x, M_Pos.y);
+		}
 	}
 })
 
 function InkDropperTool(x, y) {
 	pixels = CanvasObj.ctx.getImageData(x, y, 1, 1).data;
-	hexCode = ((pixels[0] << 16) | (pixels[1] << 8) | pixels[2]).toString(16)
-	console.log("#" + hexCode)
+	hexCode = RGB2Hex([pixels[0], pixels[1], pixels[2]]);
+	colorPicker.value = hexCode;
+	colorPickerWrapper.style.backgroundColor = hexCode;
 }
 
 function processEvents(event) {
-	var mPos = getCursorPosition(event);
+	UpdateCursorPosition(event);
 	if (tool == 'b') {
-		brushTool(mPos.x, mPos.y, [255, 255, 255, 255]);
+		brushTool(M_Pos.x, M_Pos.y, [255, 255, 255, 255]);
 	} else if (tool == 'e') {
-		eraserTool(mPos.x, mPos.y);
+		eraserTool(M_Pos.x, M_Pos.y);
 	} else if (tool == 'i') {
-		InkDropperTool(mPos.x, mPos.y);
+		InkDropperTool(M_Pos.x, M_Pos.y);
 	}
 }
