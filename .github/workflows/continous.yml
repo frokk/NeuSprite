@@ -7,30 +7,30 @@ jobs:
   Create-Release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout v3
-      - uses: actions/checkout@v3
+    - name: Checkout v3
+      uses: actions/checkout@v3
 
-      - name: Setup NodeJs
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
+    - name: Setup NodeJs
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'npm'
 
-      - name: Install Deps
-        run: npm ci
+    - name: Install Deps
+      run: npm ci
 
-      - name: Clean Left Overs
-        run: npm run clean
+    - name: Clean Left Overs
+      run: npm run clean
 
-      - name: Build
-        run: npm run build
+    - name: Build
+      run: npm run build
 
-      - name: Update/Create Continous Release
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "continuous"
-          prerelease: true
-          title: "CSprite Continuous Release"
-          files: |
-            dist/NeuSprite-release.zip
+    - name: Update/Create Continous Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "continuous"
+        prerelease: true
+        title: "CSprite Continuous Release"
+        files: |
+          dist/NeuSprite-release.zip
