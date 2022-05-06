@@ -17,9 +17,14 @@ jobs:
         node-version: 16
         cache: 'npm'
 
-    - run: npm ci
-    - run: npm run clean
-    - run: npm run build
+    - name: Install Deps
+      run: npm ci
+
+    - name: Clean Left Overs
+      run: npm run clean
+
+    - name: Build
+      run: npm run build
 
     - name: Update/Create Continous Release
       uses: "marvinpinto/action-automatic-releases@latest"
