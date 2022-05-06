@@ -1,0 +1,31 @@
+name: Continous Release Action
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  Create-Release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout v3
+    - uses: actions/checkout@v3
+
+    - name: Setup NodeJs
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm run clean
+    - run: npm run build
+
+    - name: Update/Create Continous Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "continuous"
+        prerelease: true
+        title: "CSprite Continuous Release"
+        files: |
+          dist/NeuSprite-release.zip
