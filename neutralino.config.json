@@ -40,7 +40,7 @@
 	},
 	"cli": {
 		"binaryName": "NeuSprite",
-		"resourcesPath": "/wwww/",
+		"resourcesPath": "/www/",
 		"clientLibrary": "/www/js/neutralino.js",
 		"binaryVersion": "4.5.0",
 		"clientVersion": "3.4.0"
