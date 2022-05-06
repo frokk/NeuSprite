@@ -5,7 +5,7 @@
 	"scripts": {
 		"test": "neu run",
 		"build": "node enableInspector.js false && neu build --release && node enableInspector.js true",
-		"clean": "rm -r dist"
+		"clean": "rm -rf dist"
 	},
 	"repository": {
 		"type": "git",
