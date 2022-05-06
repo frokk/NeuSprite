@@ -12,9 +12,14 @@ html, body {
 	background-color: #222;
 }
 
-#canvasHolder {
+#canvasPanArea {
 	height: 100%;
 	width: 100%;
+}
+
+#canvasWrapper {
+	position: relative;
+	display: inline-block;
 }
 
 #selectedTool {
@@ -40,7 +45,16 @@ html, body {
 	border: none;
 }
 
-canvas {
+#drawingCanvas {
+	background-color: #0000001e;
+}
+
+#brushPreview {
+	z-index: 9;
+}
+
+#drawingCanvas, #brushPreview {
+	position: absolute;
+	top: 0; left: 0;
 	image-rendering: pixelated;
-	background-color: #000000;
 }
