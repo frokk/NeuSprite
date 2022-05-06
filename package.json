@@ -4,7 +4,7 @@
 	"description": "A Pixel Art Tool",
 	"scripts": {
 		"test": "neu run",
-		"build": "node enableInspector.js false && neu build && node enableInspector.js true",
+		"build": "node enableInspector.js false && neu build --release && node enableInspector.js true",
 		"clean": "rm -r dist"
 	},
 	"repository": {
