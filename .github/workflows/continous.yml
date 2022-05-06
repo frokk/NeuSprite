@@ -34,3 +34,4 @@ jobs:
         title: "CSprite Continuous Release"
         files: |
           dist/NeuSprite-release.zip
+
