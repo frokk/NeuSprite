@@ -22,6 +22,9 @@ jobs:
     - name: Clean Left Overs
       run: npm run clean
 
+    - name: Get NeutralinoJs Binaries
+      run: npm run update
+
     - name: Build
       run: npm run build
 
