@@ -1,0 +1,21 @@
+{
+	"name": "neusprite",
+	"version": "0.0.1",
+	"description": "A Pixel Art Tool",
+	"scripts": {
+		"test": "neu run"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/DEVLOPRR/NeuSprite.git"
+	},
+	"author": "ADITYA MISHRA",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/DEVLOPRR/NeuSprite/issues"
+	},
+	"homepage": "https://github.com/DEVLOPRR/NeuSprite#readme",
+	"devDependencies": {
+		"@neutralinojs/neu": "^9.3.0"
+	}
+}
