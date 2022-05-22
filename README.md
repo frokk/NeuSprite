@@ -9,7 +9,7 @@ A Pixel Art Tool Powered By [Neutralinojs](https://github.com/neutralinojs/neutr
 
 1. Get Source Code Using Git
 ```bash
-git clone https://github.com/DEVLOPRR/NeuSprite
+git clone https://github.com/pegvin/NeuSprite
 ```
 
 2. Go Into The Cloned Repo And Install Dependencies
